@@ -194,20 +194,20 @@ document.addEventListener('DOMContentLoaded', function() {
             // Animate header
             gsap.to(sectionHeader, {
                 opacity: 1,
-                duration: 0.8,
+                duration: 0.4,
                 ease: "power2.out"
             });
             
             gsap.to(sectionHeader.querySelector('h2'), {
                 y: 0,
-                duration: 0.8,
+                duration: 0.4,
                 ease: "power2.out"
             });
             
             gsap.to(sectionHeader.querySelector('p'), {
                 y: 0,
                 duration: 0.8,
-                delay: 0.3,
+                delay: 0.4,
                 ease: "power2.out"
             });
             
@@ -216,7 +216,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 opacity: 1,
                 y: 0,
                 scale: 1,
-                duration: 0.6,
+                duration: 0.3,
                 ease: "back.out(1.7)",
                 stagger: 0.1,
                 onComplete: () => {
@@ -263,7 +263,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     rotateY: 0,
                     scale: 1,
                     y: 0,
-                    duration: 0.5
+                    duration: 0.4
                 });
             });
         });
