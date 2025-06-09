@@ -1,4 +1,96 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize particles.js
+    if (typeof particlesJS !== 'undefined') {
+        particlesJS('particles-js', {
+            particles: {
+                number: {
+                    value: 80,
+                    density: {
+                        enable: true,
+                        value_area: 800
+                    }
+                },
+                color: {
+                    value: "#F0640C"
+                },
+                shape: {
+                    type: "circle",
+                    stroke: {
+                        width: 0,
+                        color: "#000000"
+                    }
+                },
+                opacity: {
+                    value: 0.5,
+                    random: true,
+                    anim: {
+                        enable: true,
+                        speed: 1,
+                        opacity_min: 0.1,
+                        sync: false
+                    }
+                },
+                size: {
+                    value: 3,
+                    random: true,
+                    anim: {
+                        enable: true,
+                        speed: 2,
+                        size_min: 0.1,
+                        sync: false
+                    }
+                },
+                line_linked: {
+                    enable: true,
+                    distance: 150,
+                    color: "#F0640C",
+                    opacity: 0.4,
+                    width: 1
+                },
+                move: {
+                    enable: true,
+                    speed: 1,
+                    direction: "none",
+                    random: true,
+                    straight: false,
+                    out_mode: "out",
+                    bounce: false,
+                    attract: {
+                        enable: false,
+                        rotateX: 600,
+                        rotateY: 1200
+                    }
+                }
+            },
+            interactivity: {
+                detect_on: "canvas",
+                events: {
+                    onhover: {
+                        enable: true,
+                        mode: "grab"
+                    },
+                    onclick: {
+                        enable: true,
+                        mode: "push"
+                    },
+                    resize: true
+                },
+                modes: {
+                    grab: {
+                        distance: 140,
+                        line_linked: {
+                            opacity: 1
+                        }
+                    },
+                    push: {
+                        particles_nb: 4
+                    }
+                }
+            },
+            retina_detect: true
+        });
+    }
+
     // Mobile Menu Toggle
     const menuToggle = document.getElementById('mobile-menu');
     const navList = document.querySelector('.nav-list');
@@ -7,6 +99,7 @@ document.addEventListener('DOMContentLoaded', function() {
         this.classList.toggle('active');
         navList.classList.toggle('active');
         
+        // Animate hamburger icon
         const spans = this.querySelectorAll('span');
         if (this.classList.contains('active')) {
             spans[0].style.transform = 'rotate(45deg) translate(5px, 5px)';
@@ -19,7 +112,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Close mobile menu when clicking a link
+    // Close mobile menu when clicking on a link
     document.querySelectorAll('.nav-list a').forEach(link => {
         link.addEventListener('click', function() {
             if (navList.classList.contains('active')) {
@@ -42,22 +135,9 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             navbar.classList.remove('scrolled');
         }
-        
-        animateOnScroll();
     });
     
-    // Hero scroll indicator
-    const heroScroll = document.querySelector('.hero-scroll');
-    if (heroScroll) {
-        heroScroll.addEventListener('click', function() {
-            window.scrollTo({
-                top: document.querySelector('#services').offsetTop - 80,
-                behavior: 'smooth'
-            });
-        });
-    }
-    
-    // Portfolio filtering
+    // Portfolio filtering with pre-loading
     const filterButtons = document.querySelectorAll('.filter-btn');
     const portfolioItems = [
         {
@@ -92,7 +172,7 @@ document.addEventListener('DOMContentLoaded', function() {
             id: 5,
             category: 'design',
             title: 'Rótulos',
-            description: 'Rótulos para produtos',
+            description: 'Design e impressão de rótulos para produtos gourmet',
             image: 'https://img.freepik.com/free-vector/cider-label-design-template_23-2150241528.jpg?t=st=1745352627~exp=1745356227~hmac=b897350d3ffce774653bb63a7b1fa78d13e458b28a5bf97d698f0c430ab0d2a3&w=1380'
         },
         {
@@ -104,31 +184,60 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     ];
     
-    // Load portfolio items
-    function loadPortfolioItems(items) {
-        const portfolioGrid = document.querySelector('.portfolio-grid');
-        portfolioGrid.innerHTML = '';
-        
-        items.forEach(item => {
-            const portfolioItem = document.createElement('div');
-            portfolioItem.className = `portfolio-item ${item.category}`;
-            portfolioItem.innerHTML = `
-                <img src="${item.image}" alt="${item.title}" class="portfolio-img" loading="lazy">
-                <div class="portfolio-overlay">
-                    <h3>${item.title}</h3>
-                    <p>${item.description}</p>
-                </div>
-            `;
-            portfolioGrid.appendChild(portfolioItem);
+    // Preload images for better performance
+    function preloadImages() {
+        portfolioItems.forEach(item => {
+            const img = new Image();
+            img.src = item.image;
         });
     }
     
-    // Initial load
+    // Load portfolio items with loading state
+    function loadPortfolioItems(items) {
+        const portfolioGrid = document.querySelector('.portfolio-grid');
+        portfolioGrid.innerHTML = '<div class="loading-spinner"></div>';
+        
+        // Small delay to show loading (optional)
+        setTimeout(() => {
+            portfolioGrid.innerHTML = '';
+            
+            items.forEach(item => {
+                const portfolioItem = document.createElement('div');
+                portfolioItem.className = `portfolio-item ${item.category}`;
+                portfolioItem.innerHTML = `
+                    <img src="${item.image}" alt="${item.title}" class="portfolio-img">
+                    <div class="portfolio-overlay">
+                        <h3>${item.title}</h3>
+                        <p>${item.description}</p>
+                    </div>
+                `;
+                portfolioGrid.appendChild(portfolioItem);
+            });
+            
+            // Trigger animations after load
+            animatePortfolioItems();
+        }, 300);
+    }
+    
+    // Animate portfolio items after loading
+    function animatePortfolioItems() {
+        const items = document.querySelectorAll('.portfolio-item');
+        items.forEach((item, index) => {
+            setTimeout(() => {
+                item.style.opacity = '1';
+                item.style.transform = 'scale(1)';
+            }, index * 100);
+        });
+    }
+    
+    // Initial load with preloading
+    preloadImages();
     loadPortfolioItems(portfolioItems);
     
     // Filter portfolio items
     filterButtons.forEach(button => {
         button.addEventListener('click', function() {
+            // Update active button
             filterButtons.forEach(btn => btn.classList.remove('active'));
             this.classList.add('active');
             
@@ -143,7 +252,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Smooth scrolling
+    // Smooth scrolling for anchor links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function(e) {
             e.preventDefault();
@@ -160,266 +269,42 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Newsletter form
-    const newsletterForm = document.querySelector('.newsletter-form');
-    if (newsletterForm) {
-        newsletterForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const emailInput = this.querySelector('input[type="email"]');
-            const email = emailInput.value;
-            
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (emailRegex.test(email)) {
-                alert(`Obrigado por assinar nossa newsletter! Um e-mail de confirmação foi enviado para ${email}.`);
-                emailInput.value = '';
-            } else {
-                alert('Por favor, insira um endereço de email válido.');
-            }
-        });
-    }
-    
-    // Service cards animation
-    function animateServicesOnScroll() {
-        const servicesSection = document.querySelector('#services');
-        const serviceCards = document.querySelectorAll('.service-card');
-        const sectionHeader = document.querySelector('#services .section-header');
-        
-        const sectionPosition = servicesSection.getBoundingClientRect().top;
-        const screenPosition = window.innerHeight / 1.3;
-        
-        if (sectionPosition < screenPosition) {
-            servicesSection.classList.add('animated');
-            
-            // Animate header
-            gsap.to(sectionHeader, {
-                opacity: 1,
-                duration: 0.4,
-                ease: "power2.out"
-            });
-            
-            gsap.to(sectionHeader.querySelector('h2'), {
-                y: 0,
-                duration: 0.4,
-                ease: "power2.out"
-            });
-            
-            gsap.to(sectionHeader.querySelector('p'), {
-                y: 0,
-                duration: 0.8,
-                delay: 0.4,
-                ease: "power2.out"
-            });
-            
-            // Animate cards with staggered delay
-            gsap.to(serviceCards, {
-                opacity: 1,
-                y: 0,
-                scale: 1,
-                duration: 0.3,
-                ease: "back.out(1.7)",
-                stagger: 0.1,
-                onComplete: () => {
-                    // Wave effect
-                    gsap.to(serviceCards, {
-                        y: -10,
-                        scale: 1.03,
-                        duration: 0.3,
-                        stagger: 0.1,
-                        yoyo: true,
-                        repeat: 1
-                    });
-                }
-            });
-        }
-    }
-    
-    // Service cards hover effects
-    function setupServiceHoverEffects() {
-        const serviceCards = document.querySelectorAll('.service-card');
-        
-        serviceCards.forEach(card => {
-            card.addEventListener('mousemove', (e) => {
-                const rect = card.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                const centerX = rect.width / 2;
-                const centerY = rect.height / 2;
-                const angleX = (y - centerY) / 20;
-                const angleY = (centerX - x) / 20;
-                
-                gsap.to(card, {
-                    rotateX: angleX,
-                    rotateY: angleY,
-                    scale: 1.03,
-                    y: -10,
-                    duration: 0.3
-                });
-            });
-            
-            card.addEventListener('mouseleave', () => {
-                gsap.to(card, {
-                    rotateX: 0,
-                    rotateY: 0,
-                    scale: 1,
-                    y: 0,
-                    duration: 0.4
-                });
+    // Copy button functionality
+    document.querySelectorAll('.copy-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const textToCopy = this.getAttribute('data-text');
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                const originalText = this.innerHTML;
+                this.innerHTML = '<i class="fas fa-check"></i> Copiado!';
+                setTimeout(() => {
+                    this.innerHTML = originalText;
+                }, 2000);
             });
         });
-    }
+    });
     
-    // General scroll animations
+    // Animation on scroll
     function animateOnScroll() {
-        const elements = document.querySelectorAll('.portfolio-item, .info-item, .about-image, .contact-form, .map-section, .whatsapp-qr-container');
+        const elements = document.querySelectorAll('.service-card, .portfolio-item, .info-item, .about-image, .contact-form, .info-card');
         
         elements.forEach(element => {
             const elementPosition = element.getBoundingClientRect().top;
             const screenPosition = window.innerHeight / 1.3;
             
             if (elementPosition < screenPosition) {
-                gsap.to(element, {
-                    opacity: 1,
-                    y: 0,
-                    duration: 0.6,
-                    ease: "power2.out"
-                });
+                element.style.opacity = '1';
+                element.style.transform = 'translateY(0)';
             }
         });
-        
-        // Also check services section
-        animateServicesOnScroll();
     }
     
-    // WhatsApp QR code
-    function generateWhatsAppQR() {
-        const phoneNumber = '5573999037727';
-        const contactName = 'Center Cópias TX';
-        const qrSize = 150;
-        
-        const vCardData = `BEGIN:VCARD
-VERSION:3.0
-FN:${contactName}
-TEL;type=CELL;type=VOICE;waid=${phoneNumber}:+${phoneNumber}
-END:VCARD`;
-        
-        const encodedData = encodeURIComponent(vCardData);
-        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${qrSize}x${qrSize}&data=${encodedData}`;
-        
-        const qrImg = document.getElementById('whatsapp-qr');
-        if (qrImg) {
-            qrImg.src = qrUrl;
-            qrImg.alt = `Adicionar ${contactName} aos contatos`;
-            
-            qrImg.style.cursor = 'pointer';
-            qrImg.addEventListener('click', () => {
-                window.open(`https://wa.me/${phoneNumber}`, '_blank');
-            });
-        }
-    }
+    // Set initial state for animated elements
+    document.querySelectorAll('.service-card, .portfolio-item, .info-item, .about-image, .contact-form, .info-card').forEach(element => {
+        element.style.opacity = '0';
+        element.style.transform = 'translateY(20px)';
+        element.style.transition = 'all 0.5s ease';
+    });
     
-    // Copy email and phone
-    function setupCopyButtons() {
-        // Copy email
-        const copyEmailBtn = document.getElementById('copy-email');
-        const emailText = document.getElementById('email-text');
-        
-        if (copyEmailBtn && emailText) {
-            copyEmailBtn.addEventListener('click', () => {
-                copyToClipboard(emailText.textContent, copyEmailBtn);
-            });
-        }
-        
-        // Copy phone
-        const copyPhoneBtn = document.querySelector('.phone-actions .btn-copy');
-        const phoneText = document.querySelector('.phone-number');
-        
-        if (copyPhoneBtn && phoneText) {
-            copyPhoneBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                copyToClipboard(phoneText.textContent, copyPhoneBtn);
-            });
-        }
-    }
-    
-    // Helper function to copy text
-    function copyToClipboard(text, button) {
-        navigator.clipboard.writeText(text.trim())
-            .then(() => {
-                showCopyFeedback(button);
-            })
-            .catch(err => {
-                console.error('Erro ao copiar:', err);
-                const textArea = document.createElement('textarea');
-                textArea.value = text.trim();
-                document.body.appendChild(textArea);
-                textArea.select();
-                try {
-                    document.execCommand('copy');
-                    showCopyFeedback(button);
-                } catch (err) {
-                    alert('Não foi possível copiar. Por favor, copie manualmente.');
-                }
-                document.body.removeChild(textArea);
-            });
-    }
-    
-    // Show visual feedback
-    function showCopyFeedback(button) {
-        const originalText = button.innerHTML;
-        const originalBg = button.style.backgroundColor;
-        
-        button.innerHTML = '<i class="fas fa-check"></i> Copiado!';
-        button.style.backgroundColor = '#4CAF50';
-        
-        setTimeout(() => {
-            button.innerHTML = originalText;
-            button.style.backgroundColor = originalBg;
-        }, 2000);
-    }
-    
-    // Initialize
-    function init() {
-        // Set initial states
-        document.querySelectorAll('.portfolio-item, .info-item, .about-image, .contact-form, .map-section, .whatsapp-qr-container').forEach(element => {
-            gsap.set(element, {
-                opacity: 0,
-                y: 20
-            });
-        });
-        
-        // Set service cards initial state
-        const serviceCards = document.querySelectorAll('.service-card');
-        gsap.set(serviceCards, {
-            opacity: 0,
-            y: 30,
-            scale: 0.95
-        });
-        
-        // Set service header initial state
-        const sectionHeader = document.querySelector('#services .section-header');
-        gsap.set(sectionHeader, { opacity: 0 });
-        gsap.set(sectionHeader.querySelector('h2'), { y: 20 });
-        gsap.set(sectionHeader.querySelector('p'), { y: 20 });
-        
-        // Setup hover effects
-        setupServiceHoverEffects();
-        
-        // Generate QR code
-        generateWhatsAppQR();
-        
-        // Setup copy buttons
-        setupCopyButtons();
-        
-        // Run animations if section is already visible
-        if (window.location.hash === '#services') {
-            animateServicesOnScroll();
-        }
-        
-        // Run once on load
-        animateOnScroll();
-    }
-    
-    // Start everything
-    init();
+    window.addEventListener('scroll', animateOnScroll);
+    animateOnScroll(); // Run once on page load
 });
